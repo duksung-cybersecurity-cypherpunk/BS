@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 / 회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #6e45e2, #88d3ce);
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+            width: 320px;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        input {
+            padding: 12px;
+            margin-bottom: 20px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background-color: #6e45e2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #88d3ce;
+        }
+        .toggle {
+            text-align: center;
+            cursor: pointer;
+            color: #6e45e2;
+            font-size: 14px;
+            margin-top: 10px;
+            text-decoration: underline;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+        .fade-out {
+            animation: fadeOut 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0;}
+            to { opacity: 1;}
+        }
+        @keyframes fadeOut {
+            from { opacity: 1;}
+            to { opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="form-title">로그인</h2>
+        <form id="login-form">
+            <input type="text" name="username" id="username" placeholder="사용자 이름" required />
+            <input type="password" name="password" id="password" placeholder="비밀번호" required />
+            <button type="submit" id="submit-button">로그인</button>
+        </form>
+        <div id="toggle-signup" class="toggle">회원가입</div>
+    </div>
+
+    <script>
+        var isSignUp = false;
+
+        // 회원가입과 로그인 토글
+        document.getElementById('toggle-signup').addEventListener('click', function() {
+            isSignUp = !isSignUp;
+            document.getElementById('form-title').textContent = isSignUp ? '회원가입' : '로그인';
+            document.getElementById('submit-button').textContent = isSignUp ? '회원가입' : '로그인';
+            document.getElementById('toggle-signup').textContent = isSignUp ? '로그인' : '회원가입';
+        });
+
+        // 폼 제출 이벤트 리스너
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // 회원가입 시 비밀번호 조건 검사
+            if (isSignUp && !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/.test(password)) {
+                alert('비밀번호는 영어와 숫자를 조합하여야 합니다.');
+                return;
+            }
+
+
+            const actionUrl = isSignUp ? '/signup' : '/login';
+            const data = { username, password };
+
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    if (isSignUp) {
+                        alert('회원가입 성공! 로그인 페이지로 돌아갑니다.');
+                        isSignUp = false;
+                        document.getElementById('form-title').textContent = '로그인';
+                        document.getElementById('submit-button').textContent = '로그인';
+                        document.getElementById('toggle-signup').textContent = '회원가입';
+                        document.getElementById('username').value = '';
+                        document.getElementById('password').value = '';
+                    } else {
+                        // 로그인 성공 시 메뉴 페이지로 이동
+                        window.location.href = '/menu';
+                    }
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                alert('오류: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>

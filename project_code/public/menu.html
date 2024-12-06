@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메뉴</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #6e45e2, #88d3ce);
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+            width: 300px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        button {
+            background-color: #6e45e2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #88d3ce;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>메뉴</h1>
+        <button onclick="location.href='/index.html'">채팅방 접속하기</button>
+        <button onclick="fetch('/keystroke').then(response => response.text()).then(data => alert(data)).catch(error => console.error('Error:', error))">
+            키스트로크 데이터 수집하기
+        </button>
+        <button onclick="location.href='/profile.html'">프로필 꾸미기</button>
+        
+    </div>
+</body>
+</html>

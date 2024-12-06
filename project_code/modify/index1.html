@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keystroke User Prediction Chatroom</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="keystroke.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            width: 400px;
+            max-width: 100%;
+            height: 600px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #0084ff;
+            color: #ffffff;
+            padding: 15px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            text-align: center;
+        }
+        .chat-window {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-message {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .chat-message.user {
+            align-self: flex-end;
+            background-color: #0084ff;
+            color: #ffffff;
+        }
+        .chat-message.bot {
+            align-self: flex-start;
+            background-color: #e4e6eb;
+            color: #000000;
+        }
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #e4e6eb;
+        }
+        #message-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #e4e6eb;
+            outline: none;
+        }
+        #send-button {
+            background-color: #0084ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #send-button:hover {
+            background-color: #006bbf;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Chatroom</h2>
+        </div>
+        <div class="chat-window" id="chat-window">
+            <!-- 채팅 메시지가 표시될 영역 -->
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="message-input" placeholder="Type your message..." onkeydown="collectKeystroke(event)">
+            <button id="send-button" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const chatWindow = document.getElementById('chat-window');
+
+            function addMessageToChatWindow(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-message', sender);
+                messageDiv.innerText = message;
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message === '') return;
+
+                // 사용자가 입력한 메시지를 채팅창에 추가
+                addMessageToChatWindow(message, 'user');
+
+                // 입력 필드 비우기
+                messageInput.value = '';
+
+                // 키스트로크 데이터를 서버로 전송하여 사용자 예측
+                sendKeystrokeData().then(predictedUser => {
+                    if (predictedUser !== '알 수 없음') {
+                        addMessageToChatWindow(`예측된 사용자: ${predictedUser}`, 'bot');
+                    }
+                });
+            }
+
+            async function sendKeystrokeData() {
+               const intervals = []; // 예시로, 실제 키스트로크 간격 데이터를 수집해야 합니다
+               const keystrokeData = { intervals: intervals };
+
+                try {
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(keystrokeData),
+                    });
+                    if (!response.ok) {
+                        throw new Error('Prediction request failed');
+                    }
+                    const data = await response.json();
+                    return data.user;
+                } catch (error) {
+                    console.error('Error:', error);
+                    return '알 수 없음';
+                }
+            }
+
+            // 전송 버튼 클릭 시 메시지 전송
+            sendButton.addEventListener('click', sendMessage);
+
+            // Enter 키 입력 시 메시지 전송
+            messageInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
