@@ -50,11 +50,11 @@ node server.js
 ---
 
 ## requirements
-**Flask**
-**torch**
-**transformers**
-**pandas**
-**numpy**
-**scikit-learn**
-**Flask-SocketIO**
+-Flask
+-torch
+-transformers
+-pandas
+-numpy
+-scikit-learn
+-Flask-SocketIO
 
