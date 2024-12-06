@@ -32,8 +32,7 @@ JSON 파일을 사용하여 사용자 데이터 및 예측 결과 저장
 
 ## 실행방법
 ### 1. 프로젝트 클론
-git clone https://github.com/your-username/musaengche.git
-cd musaengche
+git clone https://github.com/your-username/BS.git
 ### 2. Node.js 설치
 npm install
 ### 3. Python 설치 
